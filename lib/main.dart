@@ -10,6 +10,10 @@ class ToDoListApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFFCD5C5C),
+        scaffoldBackgroundColor: Color(0xFFF5DEB3),
+      ),
       home: ToDoListScreen(),
     );
   }
@@ -183,6 +187,7 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('To-Do List'),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Column(
         children: <Widget>[
@@ -235,6 +240,10 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                 SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: _clearCompletedTasks,
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).primaryColor,
+                  )),
                   child: Text('Clear Completed'),
                 ),
               ],
