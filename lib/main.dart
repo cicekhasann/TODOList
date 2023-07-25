@@ -57,6 +57,18 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
     return tasks;
   }
 
+  int _getTotalTasks() {
+    return todoList.length;
+  }
+
+  int _getCompletedTasks() {
+    return todoList.where((task) => task.isCompleted).length;
+  }
+
+  int _getWaitingTasks() {
+    return todoList.where((task) => !task.isCompleted).length;
+  }
+
   void _addTask(String task) {
     setState(() {
       todoList.add(TaskModel(title: task, isCompleted: false));
@@ -119,6 +131,19 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
       ),
       body: Column(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Total Tasks: ${_getTotalTasks()}'),
+                SizedBox(width: 20),
+                Text('Completed Tasks: ${_getCompletedTasks()}'),
+                SizedBox(width: 20),
+                Text('Waiting Tasks: ${_getWaitingTasks()}'),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: todoList.length,
