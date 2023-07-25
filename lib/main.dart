@@ -76,6 +76,12 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
     taskController.clear();
   }
 
+  void _clearCompletedTasks() {
+    setState(() {
+      todoList.removeWhere((task) => task.isCompleted);
+    });
+  }
+
   String _formatDate(DateTime date) {
     return DateFormat('MMMM d, y').format(date);
   }
@@ -83,22 +89,32 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
   Widget _buildTaskTile(TaskModel task) {
     String taskText = _highlightTime(task.title);
 
-    if (task.isCompleted) {
-      return ListTile(
-        leading: Icon(Icons.check, color: Colors.green),
-        title: Text(
-          taskText,
-          style: TextStyle(
-              decoration: TextDecoration.lineThrough, color: Colors.red),
-        ),
-      );
-    } else {
-      return CheckboxListTile(
+    return ListTile(
+      leading: Checkbox(
         value: task.isCompleted,
         onChanged: (value) => _onTaskComplete(task, value),
-        title: Text(taskText),
-      );
-    }
+      ),
+      title: Text(
+        taskText,
+        style: task.isCompleted
+            ? TextStyle(
+                decoration: TextDecoration.lineThrough, color: Colors.red)
+            : null,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () => _changeTaskTitle(task),
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () => _deleteTask(task),
+          ),
+        ],
+      ),
+    );
   }
 
   String _highlightTime(String task) {
@@ -119,7 +135,46 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
 
   void _onTaskComplete(TaskModel task, bool? value) {
     setState(() {
-      task.isCompleted = !(task.isCompleted ?? false);
+      task.isCompleted = value ?? false;
+    });
+  }
+
+  void _changeTaskTitle(TaskModel task) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Change Task Title'),
+        content: TextField(
+          controller: taskController,
+          decoration: InputDecoration(hintText: 'Enter new task title'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              String newTitle = taskController.text.trim();
+              if (newTitle.isNotEmpty) {
+                setState(() {
+                  task.title = newTitle;
+                });
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteTask(TaskModel task) {
+    setState(() {
+      todoList.remove(task);
     });
   }
 
@@ -176,6 +231,11 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                 ElevatedButton(
                   onPressed: loadFile,
                   child: Text('Select MD File'),
+                ),
+                SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: _clearCompletedTasks,
+                  child: Text('Clear Completed'),
                 ),
               ],
             ),
